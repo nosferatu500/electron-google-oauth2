@@ -23,13 +23,11 @@ export class UserClosedWindowError extends Error {
  */
 
 export type ElectronGoogleOAuth2Options = {
-  successRedirectURL: string,
   loopbackInterfaceRedirectionPort: number,
   refocusAfterSuccess: boolean,
 };
 
 export const defaultElectronGoogleOAuth2Options: ElectronGoogleOAuth2Options = {
-  successRedirectURL: 'https://getstation.com/app-login-success/',
   // can't be randomized
   loopbackInterfaceRedirectionPort: 42813,
   refocusAfterSuccess: true,
@@ -125,7 +123,6 @@ class ElectronGoogleOAuth2 extends EventEmitter {
     this.server = new LoopbackRedirectServer({
       port: this.options.loopbackInterfaceRedirectionPort,
       callbackPath: '/callback',
-      successRedirectURL: this.options.successRedirectURL,
     });
 
     shell.openExternal(urlParam);

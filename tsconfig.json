@@ -11,13 +11,13 @@
     "noImplicitThis": true,
     "noUnusedParameters": true,
     "noEmitHelpers": false,
-    "module": "commonjs",
+    "module": "CommonJS",
     "moduleResolution": "node",
-    "target": "es2016",
+    "target": "ES2021",
     "outDir": "./lib",
     "jsx": "react",
     "lib": [
-      "es2017",
+      "ES2021",
       "dom"
     ]
   },
