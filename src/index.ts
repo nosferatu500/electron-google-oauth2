@@ -1,13 +1,11 @@
 // inspired by https://github.com/parro-it/electron-google-oauth
-import { BrowserWindow, remote, shell } from 'electron';
+import { BrowserWindow, shell } from 'electron';
 import { EventEmitter } from 'events';
 import { OAuth2Client } from 'google-auth-library';
 import { Credentials } from 'google-auth-library/build/src/auth/credentials';
 import { stringify } from 'querystring';
 import * as url from 'url';
 import LoopbackRedirectServer from './LoopbackRedirectServer';
-
-const BW: typeof BrowserWindow = process.type === 'renderer' ? remote.BrowserWindow : BrowserWindow;
 
 export class UserClosedWindowError extends Error {
   constructor() {
@@ -79,7 +77,7 @@ class ElectronGoogleOAuth2 extends EventEmitter {
    * @param {boolean} forceAddSession
    * @returns {string}
    */
-  generateAuthUrl(forceAddSession: boolean = false) {
+  generateAuthUrl(forceAddSession: boolean = false): string {
     let url = this.oauth2Client.generateAuthUrl({
       access_type: 'offline', // 'online' (default) or 'offline' (gets refresh_token)
       scope: this.scopes,
@@ -99,7 +97,7 @@ class ElectronGoogleOAuth2 extends EventEmitter {
    * @param {boolean} forceAddSession
    * @returns {Promise<string>}
    */
-  getAuthorizationCode(forceAddSession: boolean = false) {
+  getAuthorizationCode(forceAddSession: boolean = false): Promise<string> {
     const url = this.generateAuthUrl(forceAddSession);
     return this.openAuthWindowAndGetAuthorizationCode(url);
   }
@@ -109,7 +107,7 @@ class ElectronGoogleOAuth2 extends EventEmitter {
    * @param {string} urlParam
    * @returns {Promise<string>}
    */
-  openAuthWindowAndGetAuthorizationCode(urlParam: string) {
+  openAuthWindowAndGetAuthorizationCode(urlParam: string): Promise<string> {
     return this.openAuthPageAndGetAuthorizationCode(urlParam);
   }
 
@@ -141,7 +139,7 @@ class ElectronGoogleOAuth2 extends EventEmitter {
 
     if (this.options.refocusAfterSuccess) {
       // refocus on the window
-      BW.getAllWindows().filter(w => w.isVisible()).forEach(w => w.show());
+      BrowserWindow.getAllWindows().filter(w => w.isVisible()).forEach(w => w.show());
     }
 
     return parsed.query.code as string
@@ -152,17 +150,13 @@ class ElectronGoogleOAuth2 extends EventEmitter {
    * @param {boolean} forceAddSession
    * @returns {Promise<Credentials>}
    */
-  openAuthWindowAndGetTokens(forceAddSession: boolean = false) {
-    return this
-      .getAuthorizationCode(forceAddSession)
-      .then((authorizationCode) => {
-        return this.oauth2Client
-          .getToken(authorizationCode)
-          .then(response => {
-            this.oauth2Client.setCredentials(response.tokens);
-            return response.tokens;
-          });
-      });
+  async openAuthWindowAndGetTokens(forceAddSession: boolean = false): Promise<Credentials> {
+    const authorizationCode = await this
+      .getAuthorizationCode(forceAddSession);
+    const response = await this.oauth2Client
+      .getToken(authorizationCode);
+    this.oauth2Client.setCredentials(response.tokens);
+    return response.tokens;
   }
 
   setTokens(tokens: Credentials) {

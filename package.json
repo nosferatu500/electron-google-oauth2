@@ -1,11 +1,20 @@
 {
   "name": "@nosferatu500/electron-google-oauth2",
-  "version": "3.0.3",
+  "version": "3.1.0",
   "description": "A Google OAuth2 module for your Electron app.",
   "license": "MIT",
   "repository": "nosferatu500/electron-google-oauth2",
-  "main": "./lib/index",
-  "types": "./lib/index",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./lib/index.d.ts",
+      "module": "./esm/index.js",
+      "import": "./esm/index.mjs",
+      "default": "./index.js"
+    }
+  },
   "author": {
     "name": "Joël Charles",
     "email": "joel@getstation.com"
@@ -28,7 +37,7 @@
   ],
   "devDependencies": {
     "@types/node": "^16.18.16",
-    "electron": "^13.6.9",
+    "electron": "20.3.8",
     "typescript": "^4.9.5"
   },
   "dependencies": {
